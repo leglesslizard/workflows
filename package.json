@@ -6,6 +6,6 @@
 	"author": "Neil Pie <neil@neilpie.co.uk>",
 	"license": "MIT",
 	"scripts": {
-		"deploy-buddyboss": "rsync -avP --no-perms --no-times   ./* client_joey@3.95.80.172:~/sites/buddyboss.annamasonart.com/wp-content/plugins/workflows",
+		"deploy-buddyboss": "rsync -avP --no-perms --no-times   ./* client_joey@3.95.80.172:~/sites/buddyboss.annamasonart.com/wp-content/plugins/workflows"
 	}
 }
