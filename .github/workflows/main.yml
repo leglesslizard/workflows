@@ -1,66 +1,30 @@
-on: 
+# This is a basic workflow to help you get started with Actions
+
+name: TEST build and deploy
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches:
-      - main
+    branches: [ "test/deploy-script" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This job utilises a marketplace action tag to automatically create a release when a pull request 
-  # is labelled as release:major, release:minor or release:patch (it can also be controlled via commit
-  # message - see their docs for more info)
-  #
-  # Unfortunately it doesn't expose a point at which we can change the files before the Version is
-  # tagged, so we run it in 'dry-run' mode and expose its outputs for use later if required
-  check_for_release:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.prerelease.outputs.version }}
-      release_body: ${{ steps.prerelease.outputs.body }}
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - id: prerelease
-        uses: rymndhng/release-on-push-action@master
-        name: Check if we are running a new release
-        with:
-          tag_prefix: ""
-          bump_version_scheme: norelease
-          dry_run: true
-          use_github_release_notes: true
-  # This job only runs if the previous job detects that a new release is required. It checks out the 
-  # main branch of the repo, runs some string replaces via `sed` to bump the version numbers. These
-  # may be changed to suit your project if required.
-  #
-  # @TODO Investigate the possibility of adding a build step between Bump the Version Numbers and
-  # Create a Github Release. The release action allows for zip artifacts to be uploaded, which may
-  # be extremely appropriate for distribution.
-  create_release:
-    needs: check_for_release
-    runs-on: ubuntu-latest
-    if: needs.check_for_release.outputs.version
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v3
-      
-      - name: Get current date
-        id: get_date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-      
-      - name: Bump the version numbers
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
         run: |
-          echo "Creating release version ${{ needs.check_for_release.outputs.version }}"
-          sed -i "s/version\":\ \"[0-9]\+\.\?[0-9]*\.\?[0-9]*/version\":\ \"${{ needs.check_for_release.outputs.version }}/g" ./package.json
-          sed -i "s/Version:\ [0-9]\+\.\?[0-9]*\.\?[0-9]*/Version:\ ${{ needs.check_for_release.outputs.version }}/g" ./plugin.php
-          sed -i "s/\[Unreleased\]/\[${{ needs.check_for_release.outputs.version }}\] ${{steps.get_date.outputs.date}} /g" ./changelog.md
-          git config user.name "Github Actions"
-          git config user.email "<>"
-          git add .
-          git commit -am "Version Numbering"
-          git push
-      
-      - name: Create a GitHub release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ needs.check_for_release.outputs.version }}
-          name: ${{ needs.check_for_release.outputs.version }}
-          body: ${{ needs.check_for_release.outputs.release_body }}
+          yarn build
+          yarn deploy-buddyboss

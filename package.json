@@ -1,16 +1,11 @@
 {
-	"name": "ascott-analytical-chambers-test-standards",
+	"name": "workflows",
 	"version": "6.0.1",
 	"main": "index.js",
-	"repository": "git@bitbucket.org:pieweb/ascott-analytical-chambers-test-standards.git",
+	"repository": "git@github.com:leglesslizard/workflows.git",
 	"author": "Neil Pie <neil@neilpie.co.uk>",
 	"license": "MIT",
-	"dependencies": {
-		"lodash": "^4.17.4",
-		"vue": "^2.4.1"
-	},
 	"scripts": {
-		"deploy-dev": "rsync -avP ./* ascottdev@ascottdev.ssh.wpengine.net:~/sites/ascottdev/wp-content/plugins/ascott-analytical-chambers-test-standards",
-		"deploy-stg": "rsync -avP ./* ascottstg@ascottstg.ssh.wpengine.net:~/sites/ascottstg/wp-content/plugins/ascott-analytical-chambers-test-standards"
+		"deploy-buddyboss": "rsync -avP --no-perms --no-times   ./* client_joey@3.95.80.172:~/sites/buddyboss.annamasonart.com/wp-content/plugins/workflows",
 	}
 }
